@@ -52,6 +52,7 @@ def create_state(field_width, field_height, rng):
         "score": 0,           # w11演習01で更新する
         "level": 1,           # 100行進むごとに上昇
         "scroll_progress": 0.0,
+        "dist" : 0,
         "field_width": field_width,
         "field_height": field_height,
         "course_center": field_width // 2,
@@ -70,6 +71,8 @@ def create_course_row(state, rng, with_tree=True):
     """コースを1行生成する。木や崖の生成は講師提供部分。"""
     width = state["field_width"]
     half = state["course_half_width"]
+    coin = None
+    
 
     # 崖の幅とコース中心を急激に変化させず、通れる幅を確保する。
     if rng.random() < 0.13:
@@ -85,6 +88,10 @@ def create_course_row(state, rng, with_tree=True):
     tree_rate = min(0.52, 0.23 + (state["level"] - 1) * 0.055)
     if with_tree and rng.random() < tree_rate:
         tree = rng.randint(left + 3, right - 3)
+    if with_tree and rng.random() < 0.12:
+        coin = rng.randint(left + 3, right - 3)
+    if coin == tree:
+        coin = None
 
     return {"left": left, "right": right, "tree": tree}
 
@@ -107,7 +114,7 @@ def move_course_one_row(state, rng):
     state["x"] += state["direction"]
     state["scroll_count"] += 1
     state["level"] = state["scroll_count"] // 100 + 1
-
+    state["dist"] += 1
     # 演習対象の関数は「1行進むたび」に呼ばれる。
     update_distance_score(state)
 
