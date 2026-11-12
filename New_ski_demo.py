@@ -1,3 +1,4 @@
+
 """第11回配布教材：ASCIIスキーゲーム（学生版）。
 
 実行：python w11_ski_demo.py
@@ -44,7 +45,8 @@ def create_state(field_width, field_height, rng):
         "x": field_width // 2,
         "y": max(3, int(field_height * 0.35)),
         "direction": 1,     # -1: 左、+1: 右。直進（0）は使わない。
-        "speed": 1.0,
+        "base_speed": 10.0,
+        "speed" : 0,
         "elapsed_time": 0.0,   # 一時停止中は増えない
         "scroll_count": 0,    # コースが進んだ行数
         "score": 0,           # w11演習01で更新する
@@ -128,7 +130,7 @@ def update_game(state, dt, rng):
         return
 
     state["elapsed_time"] += dt
-    state["speed"] = 1.0 + (state["level"] - 1) * 0.15
+    state["speed"] = state["base_speed"] + (state["level"] - 1) * 0.2
 
     # 毎フレームではなく、実際に1行進んだときだけ位置と距離を更新する。
     state["scroll_progress"] += 3.0 * state["speed"] * dt
@@ -181,7 +183,7 @@ def draw_game(screen, state):
         f"DIST {state['scroll_count']:05d} | TIME {mins:02d}:{seconds:02d}"
     )
     turn = "LEFT" if state["direction"] == -1 else "RIGHT"
-    info = f"SPEED {state['speed']:.2f}x | TURN {turn} | STATE {state['status']}"
+    info = f"SPEED {float(state['speed']):.2f}x | TURN {turn} | STATE {state['status']}"
     draw_line(screen, 0, hud, curses.A_BOLD)
     draw_line(screen, 1, info)
     screen.addnstr(2, offset, "=" * width, width)
@@ -262,7 +264,7 @@ def run(screen):
 
         update_game(state, dt, rng)
         draw_game(screen, state)
-        time.sleep(1.0 / FPS)
+        time.sleep(1 / FPS)
 
 
 def main():
